@@ -18,6 +18,7 @@ import shutil
 import physics
 
 # This is a test to learn the ropes of git commits!
+# this is another test
 
 comm = mpi4py.MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -421,7 +422,7 @@ def MakeFigs(MODEL, key):
     f = FUNCTIONS
     o = OPTIONS
     sys = SYSTEMS
-    
+
     stokes = sys.stokes
     z_hat = p.z_hat
     mesh = m.mesh
@@ -435,13 +436,13 @@ def MakeFigs(MODEL, key):
     densityFn = f.densityFn
     viscosityFn = f.viscosityFn
     yieldFn = f.yieldFn
-    
+
     strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv = physics.GetStressStrain(viscosityFn, velocityField)
 
     outputPath = o.projectname + '_Output/' + o.projectname
 
     aspect = p.aspect
-    
+
     step = MODEL.MISC.currentStep
     modeltime = MODEL.MISC.currentTime
 
@@ -449,7 +450,7 @@ def MakeFigs(MODEL, key):
     showfigwidth = OPTIONS.showfigquality * 100 * int(aspect)
     savefigheight = (OPTIONS.savefigquality * 100) + 100
     savefigwidth = OPTIONS.savefigquality * 100 * int(aspect)
-    
+
     showParticles = True
     showTemp = True
     showDensity = True
@@ -572,7 +573,7 @@ def MakeData(MODEL):
         npPartialTemperatureField = Numpify(OPTIONS.dataRes, PARAMETERS.aspect, MESHES.mesh, MESHES.temperatureField)
         npGatheredTemperatureField = comm.gather(npPartialTemperatureField, root = 0)
         npTemperatureField = np.prod(npGatheredTemperatureField, axis = 0)
-        
+
         dataDict = {
             'step': MODEL.MISC.currentStep,
             'Nu': physics.FindNusseltNumber(temperatureField, mesh, maxX, maxY),
@@ -628,10 +629,10 @@ def MakeDataTuples(dataDict):
         else:
             onedHeaderList.append(key)
             onedDataList.append(dataDict[key])
-            
+
     zerodDataTuple = (zerodHeaderList, zerodDataList)
     onedDataTuple = (onedHeaderList, onedDataList)
-    
+
     return zerodDataTuple, onedDataTuple
 
 def PrintData(DATA, step, modeltime):
@@ -646,9 +647,9 @@ def GatherData(MODEL):
     # Returns a 'workingDict' to Proc 0
     # containing numpy arrays
     # (all other procs get None)
-    
+
     # (DOESN'T DO ANYTHING YET)
-    
+
     workingDict = {}
     return workingDict
 
@@ -725,7 +726,7 @@ def CopyMODEL(MODEL):
         })
     #blahmesh = uw.mesh.FeMesh_Cartesian( elementType='Q1/dQ0', elementRes=(16,16), minCoord=(0.,0.), maxCoord=(1.,1.) )
     #MODELcopy.SetVal('mesh', MODELcopy.MESHES.temperatureField.mesh)
-    
+
     MODELcopy.SWARMS.SetVal('swarm', uw.swarm.Swarm(MODELcopy.MESHES.mesh))
     MODELcopy.SWARMS.SetVal('materialVar', MODELcopy.SWARMS.swarm.add_variable(dataType='int', count=1))
 
@@ -753,7 +754,7 @@ def LoadState(MODEL, loadStep):
     #for index, coords in enumerate(loadSwarm.particleCoordinates.data):
         #with MODEL.SWARMS.swarm.deform_swarm():
             #MODEL.SWARMS.swarm.particleCoordinates.data[index] = coords
-    
+
     #MODEL.SWARMS.SetVal('swarm', uw.swarm.Swarm(mesh = MODEL.MESHES.mesh))
     #MODEL.SWARMS.SetVal('materialVar', MODEL.SWARMS.swarm.add_variable(dataType = "int", count = 1))
     #MODEL.SWARMS.swarm.load(filename + 'swarm_' + str(step) + '.h5')
@@ -917,7 +918,7 @@ def Run(MODEL, startStep = 0):
     if startStep == 0:
         if rank == 0:
             print "Starting from step zero."
-        
+
         # Bit of house cleaning to make sure the output folder is suitable:
         #if rank == 0:
             #if os.path.exists(outputDir + 'miscLog.csv'):

@@ -1,6 +1,8 @@
 # physics.py
 # part of the planetengine package
 
+# this is a test of git commits
+
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -48,15 +50,15 @@ def FindFieldAverage(mesh, scalarField):
 
 def FindVRMS(velocityField, mesh):
     # **RMS velocity**
-    # 
+    #
     # The root mean squared velocity is defined by intergrating over the entire simulation domain via
-    # 
+    #
     # \\[
     # \begin{aligned}
     # v_{rms}  =  \sqrt{ \frac{ \int_V (\mathbf{v}.\mathbf{v}) dV } {\int_V dV} }
     # \end{aligned}
     # \\]
-    # 
+    #
     # where $V$ denotes the volume of the box.
 
     # In[12]:
@@ -71,9 +73,9 @@ def FindVRMS(velocityField, mesh):
 def FindNusseltNumber(temperatureField, mesh, xmax, zmax):
 
     # **Nusselt number**
-    # 
+    #
     # The Nusselt number is the ratio between convective and conductive heat transfer
-    # 
+    #
     # \\[
     # Nu = -h \frac{ \int_0^l \partial_z T (x, z=h) dx}{ \int_0^l T (x, z=0) dx}
     # \\]
@@ -95,8 +97,8 @@ def npFindNusseltNumber(maxVertCoord, npTemperatureField):
 def GetStressStrain(viscosityFn, velocityField):
 
     # **Calculate stress values for benchmark comparison**
-    # 
-    # 
+    #
+    #
     # Determine stress field for whole box in dimensionless units (King 2009)
     # \begin{equation}
     # \tau_{ij} = \eta \frac{1}{2} \left[ \frac{\partial v_j}{\partial x_i} + \frac{\partial v_i}{\partial x_j}\right]
@@ -107,13 +109,13 @@ def GetStressStrain(viscosityFn, velocityField):
     # \end{equation}
     # which is implemented for the whole box in the functions defined below.
 
-    # ### Deviatoric stress 
-    # 
+    # ### Deviatoric stress
+    #
     # The deviatoric stress is computed from the constitutive law based on the viscosity that
     # results from the solution to the non-linear Stokes equation.
-    # 
+    #
     # **Note:** the deviatoric stress is defined in terms of functions we have defined already
-    # but the value will be meaningless if the viscosityFn is modified in any way after the 
+    # but the value will be meaningless if the viscosityFn is modified in any way after the
     # solve is complete because evaluation is made only when the values at particular points are needed.
 
     # In[14]:
@@ -189,23 +191,23 @@ def Build_BlankenVisc_1 (eta0, refTemp, temperatureField):
 def Build_PlasticVisc_1 (velocityField, PARAMETERS):
     # This is based off Lenardic et al 2008 - A climate induced transition.
     # It outputs an effective viscosity for a plastically deforming material.
-	
+
 	# ### Viscoplastic rheology
-    # 
+    #
     # Lenardic et al 2008 - A climate induced transition
-    # 
+    #
     # Stress is nondimensionalised with $\frac{d^2}{\kappa \mu_0} $ where d is the mantle depth, $ \kappa $ is the mantle thermal diffusivity, and $\mu_0$ is the reference viscosity (defined at the top surface of the mantle).
-    # 
+    #
     # Nondimensional yield stress is:
-    # 
+    #
     # $ \tau_y = \tau_{y0} + \tau_{yz}Z $
-    # 
+    #
     # $\tau_y$ is the depth-dependent yield stress, $\tau_{y0}$ is a prescribed surface value, and Z is non-dimensional depth.
-    # 
+    #
     # $\tau_{yz}$ is the depth-dependent term. It is non-dimensionalised by $\frac{f_cRa_0}{\alpha\Delta T} $ where $Ra_0$ is the mantle Rayleigh number at the reference viscosity, $\Delta T $ is the temperature drop across the mantle, $f_c$ is a friction coefficient, and $\alpha$ is the coefficient of thermal expansion.
 
     # In[ ]:
-    
+
     Ra = PARAMETERS.Ra
     frictionCoefficient = PARAMETERS.frictionCoefficient
     boundaryLayerThickness = PARAMETERS.boundaryLayerThickness
@@ -214,7 +216,7 @@ def Build_PlasticVisc_1 (velocityField, PARAMETERS):
     alpha = PARAMETERS.alpha
     deltaT = PARAMETERS.deltaT
     refYieldStress = PARAMETERS.refYieldStress
-    
+
     strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv = GetStressStrain(1., velocityField)
 
     stressNonDimFactor = boundaryLayerThickness**2 / diffusivity / eta0
@@ -225,9 +227,9 @@ def Build_PlasticVisc_1 (velocityField, PARAMETERS):
 
     yieldStressFn = refYieldStress + depthYieldStress * utilities.depthFn
     yieldViscosityFn = yieldStressFn / (secInv + 1.0e-18)
-    
+
     plasticViscFn = yieldViscosityFn
-    
+
     return plasticViscFn
 
 def Build_PlasticVisc_2(tau0, tau1, velocityField):
