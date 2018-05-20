@@ -1,0 +1,60 @@
+INSTRUCTIONS
+
+First off, some useful URLs:
+https://opus.nci.org.au/display/Help/NCI+Help
+https://github.com/underworldcode/underworld2
+https://my.nci.org.au/mancini/
+http://openplanetary.co/
+
+Loose approach to Raijin:
+
+STEP 1: Log in.
+https://opus.nci.org.au/display/Help/How+to+login+to+Raijin
+Summarised: just open a Linux terminal and go:
+ssh abc123@raijin.nci.org.au
+(where abc123 is replaced with your username, in my case rb9096)
+You are now ssh'ed into Raijin land. This means you've basically logged in to a remote computer.
+Read all about ssh here:
+https://www.ssh.com/ssh/command/
+
+STEP 2:
+Get planetengine:
+git clone https://github.com/rsbyrne/planetengine.git
+This will create a folder called planetengine.
+Navigate to this folder:
+cd planetengine
+This is where all your work will be done.
+It comes with the file structure already in place
+to make everything work properly.
+Now you must get Underworld2:
+sh raijinuw.sh
+(this is just a copy of: underworld2/docs/install_guides/nci_raijin.sh)
+This will create a folder called underworld containing all the code needed to make underworld work.
+(i.e. it's what is referred to when you go 'import underworld')
+
+STEP 3:
+Check the jobscript:
+nano jobscript
+Make sure everything's right.
+Check the python script:
+nano localscript.py
+Make sure everything's right.
+
+STEP 4:
+Submit the jobscript:
+qsub jobscript
+Write down your jobid!
+(On Raijin it should look something like: 1234.r-man2)
+
+STEP 5:
+Check on your job:
+qstat -s jobid
+...where 'jobid' is the jobid you cleverly jotted down earlier)
+
+STEP 6:
+Recover your data.
+Not sure how yet???
+But probably can be done using the usual SSH interface,
+copying stuff from my instance of Raijin to my local device
+or even uploading it somewhere (if I'm really clever).
+Might also be possible just to push everything back up to git.
