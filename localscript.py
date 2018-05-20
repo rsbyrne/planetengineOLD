@@ -16,7 +16,7 @@ import csv
 import mpi4py
 import os
 import time
-import planetengine
+import planetengine1 as planetengine
 from planetengine import utilities
 from planetengine import physics
 from planetengine import templates
