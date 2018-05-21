@@ -1,0 +1,15 @@
+Change ownership of everything in this directory recursively to root:
+sudo chown -R username:root .
+
+Assorted examples of underworld commands:
+
+sudo docker run -p 8888:8888 -v /media/sf_Phobos_shared/rsb_shared:/workspace/my_data underworldcode/underworld2
+
+sudo docker run -v /media/sf_Phobos_shared/rsb_shared:/workspace/my_data -i -t underworldcode/underworld2 /bin/bash
+
+Within shell:
+mpirun -np 2 python localscript.py
+
+sudo docker run -v /media/sf_Phobos_shared/rsb_shared/parallel:/workspace underworldcode/underworld2 mpirun -np 2 python localscript.py
+
+sudo docker run -p 8888:8888 -v /home/rohanbyrne/Documents/PhD_on_Phobos:/workspace/my_data underworldcode/underworld2
