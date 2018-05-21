@@ -62,3 +62,20 @@ But probably can be done using the usual SSH interface,
 copying stuff from my instance of Raijin to my local device
 or even uploading it somewhere (if I'm really clever).
 Might also be possible just to push everything back up to git.
+
+GENERAL TIPS
+
+View everything, including hidden files:
+ls -la
+Use this to edit, for example, your .profile script, which is a bash script that runs when you login.
+
+List available modules:
+module list
+Tells you what modules are currently accessible.
+
+Open a live python interpreter:
+python
+This is a special, console build of python - i.e. just cos you can access this
+does NOT mean your python scripts will run!
+It's really just a light python interface to do console stuff.
+
