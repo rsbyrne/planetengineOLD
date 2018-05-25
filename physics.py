@@ -70,23 +70,28 @@ def FindVRMS(velocityField, mesh):
     vrms = math.sqrt(intVdotV.evaluate()[0]) / utilities.FindVolume(mesh)
     return vrms
 
-def FindNusseltNumber(temperatureField, mesh, xmax, zmax):
+def FindNusseltNumber(temperatureField, mesh):
+    # The Nusselt number is the ratio between
+    # convective and conductive heat transfer.
+    # It is defined as
+    # the top vertical surface gradient
+    # divided by the basal temperature.
 
-    # **Nusselt number**
-    #
-    # The Nusselt number is the ratio between convective and conductive heat transfer
-    #
-    # \\[
-    # Nu = -h \frac{ \int_0^l \partial_z T (x, z=h) dx}{ \int_0^l T (x, z=0) dx}
-    # \\]
+    topTempSurfGradIntegral = FindSurfaceFlux(
+        mesh, 'Top', temperatureField
+        )
+    basalTempIntegral = uw.utils.Integral(
+        fn = temperatureField,
+        mesh = mesh,
+        integrationType = 'surface',
+        surfaceIndexSet = utilities.WhichWall('Bottom')
+        )
+    NuFn = topTempSurfGradIntegral / basalTempIntegral
+    Nu = NuFn.evaluate_global()
+    return Nu
 
-    BottomInt = 0.0
-    GradValues = temperatureField.fn_gradient[1].evaluate(mesh.specialSets["MaxJ_VertexSet"])
-    TopInt = sum(GradValues)
-    for index in mesh.specialSets["MinJ_VertexSet"]:
-        BottomInt += temperatureField.data[index]
-    Nu = -zmax*TopInt/BottomInt
-    return Nu[0]
+def TopSurfVelRMS(velocityField, mesh):
+
 
 def npFindNusseltNumber(maxVertCoord, npTemperatureField):
     TopInt = sum(np.gradient(npTemperatureField)[1][0])
