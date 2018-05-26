@@ -64,7 +64,7 @@ MISC = MODEL.MISC
 # In[ ]:
 
 OPTIONS.SetVals({
-    'projectname': 'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
+    'projectname': 'Testing1', #'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
 
     'showfigquality': 4,
     'savefigquality': 8,
@@ -75,16 +75,14 @@ OPTIONS.SetVals({
     'analyseFromLoadedState': False
     })
 
-#OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(30000, False))
-OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.6, False))
-OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.ConstantBool(False))
-OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(False))
-OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.ConstantBool(False))
+OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.1, False))
+OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.ConstantBool(True))
+OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(True))
+OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.ConstantBool(True))
 OPTIONS.SetVal('saveFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
 OPTIONS.SetVal('showFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
-#OPTIONS.SetVal('saveStateCondition', utilities.RuntimeCondition.UponCompletion(True))
 OPTIONS.SetVal('saveStateCondition', utilities.RuntimeCondition.CombinedCondition('any',
-    ((utilities.RuntimeCondition.StepInterval(10), utilities.RuntimeCondition.UponCompletion(True)))))
+    ((utilities.RuntimeCondition.StepInterval(10000), utilities.RuntimeCondition.UponCompletion(True)))))
 
 # In[ ]:
 
@@ -125,7 +123,7 @@ PARAMETERS.SetVals({
     # Non-physicsy stuff
 
     'aspect':1,
-    'res':64,
+    'res':16,
     'particlesPerCell':12,
     'presolve':False,
     'randomSeed':1066,
@@ -244,6 +242,9 @@ SWARMS.swarm.populate_using_layout(
 SWARMS.SetVal('materialVar', SWARMS.swarm.add_variable(dataType = "int", count = 1))
 SWARMS.materialVar.data[:] = 0
 
+FUNCTIONS.SetVal('strainRateFn', fn.tensor.symmetric(velocityField.fn_gradient))
+FUNCTIONS.SetVal('secInv', fn.tensor.second_invariant(FUNCTIONS.strainRateFn))
+
 FUNCTIONS.SetVals({
     'yieldStressFn': PARAMETERS.tau0 + (PARAMETERS.tau1 * utilities.depthFn),
     'secInv': fn.tensor.second_invariant(fn.tensor.symmetric(MESHES.velocityField.fn_gradient))
@@ -280,6 +281,10 @@ FUNCTIONS.SetVals({
         (True, 1.)
         ])
     })
+
+FUNCTIONS.SetVal('stressFn', 2. * FUNCTIONS.viscosityFn * FUNCTIONS.strainRateFn)
+FUNCTIONS.SetVal('devStressFn', fn.tensor.deviatoric(FUNCTIONS.stressFn))
+FUNCTIONS.SetVal('devStress2ndInv' = fn.tensor.second_invariant(FUNCTIONS.devStressFn))
 
 MESHES.temperatureField.load("VERYIMPORTANT64.h5", interpolate=True)
 
