@@ -567,8 +567,8 @@ def MakeData(MODEL):
     maxY = p.maxY
     modeltime = MODEL.MISC.currentTime
 
-    #vertStressTop, horizStressTop = physics.FindSurfaceStresses(velocityField, viscosityFn, mesh, swarm, devStressField)
-    #surfVel = physics.FindSurfaceHorizontalVelocity(mesh, velocityField, 100)
+    hStTop, vStTop, hStRMSTop, vStRMSTop, hStMaxTop, vStMaxTop = 
+        FindSurfaceStresses(MESHES.devStressField, MESHES.mesh, 'Top')
 
     # Data points
     dataDict = {
@@ -580,14 +580,13 @@ def MakeData(MODEL):
         'avTemp': physics.FindFieldAverage(mesh, temperatureField),
         'avYield': physics.FindFieldAverage(mesh, yieldFn),
         'avVisc': physics.FindFieldAverage(mesh, viscosityFn),
-        #'maxVertStressTop': np.max(vertStressTop),
-        #'maxHorizStressTop': np.max(horizStressTop),
+        'hStRMSTop': hStRMSTop,
+        'vStRMSTop': vStRMSTop,
+        'hStMaxTop': hStMaxTop,
+        'vStMaxTop': vStMaxTop,
         'modeltime': modeltime,
-        'timeGa': modeltime * f.timescale,
-        #'vertStressTop': vertStressTop,
-        #'horizStressTop': horizStressTop,
-        #'surfVel': surfVel
-            }
+        'timeGa': modeltime * f.timescale
+        }
 
     return dataDict
 
@@ -850,6 +849,9 @@ def RunLoop(MODEL, startTime):
 
     MODEL.SYSTEMS.population_control.repopulate()
 
+    projector = uw.utils.MeshVariable_Projection(MODEL.MESHES.devStressField, FUNCTIONS.stressFn, type=0)
+    projector.solve()
+
     if rank == 0:
         print "All the meaty stuff is done."
 
@@ -918,6 +920,8 @@ def Run(MODEL, startStep = 0):
         #SWARMS.materialVar.data[:] = FUNCTIONS.initialMaterialFn
         MODEL.FUNCTIONS.initialTempFn.evaluate(MODEL.MESHES.mesh)
         MODEL.MESHES.HField.data[:] = MODEL.FUNCTIONS.initialHFn
+        projector = uw.utils.MeshVariable_Projection(MODEL.MESHES.devStressField, FUNCTIONS.stressFn, type=0)
+        projector.solve()
 
         if MODEL.OPTIONS.saveStateCondition.evaluate(MODEL):
             SaveState(MODEL)
