@@ -90,9 +90,21 @@ def FindNusseltNumber(temperatureField, mesh):
     Nu = NuFn.evaluate_global()[0]
     return Nu
 
-def TopSurfVelRMS(mesh, velocityField, n):
-    surfVel = FindSurfaceHorizontalVelocity(mesh, velocityField, n)
-    rms = np.root(np.mean(np.square(surfVel)
+def FindSurfVRMS(mesh, velocityField, whichwall):
+    wall = utilities.WhichWall(whichwall)
+    velSqIntegral = uw.utils.Integral(
+        fn = fn.math.dot(velocityField, velocityField),
+        mesh = mesh,
+        integrationType = 'surface',
+        surfaceIndexSet = wall
+        )
+    meshIntegral = uw.utils.Integral(
+        fn = 1.,
+        mesh = mesh,
+        integrationType = 'surface',
+        surfaceIndexSet = wall
+        )
+    rms = math.sqrt(velSqIntegral.evaluate()[0] / meshIntegral.evaluate()[0])
     return rms
 
 def npFindNusseltNumber(maxVertCoord, npTemperatureField):
