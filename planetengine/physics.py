@@ -90,10 +90,10 @@ def FindNusseltNumber(temperatureField, mesh):
     Nu = NuFn.evaluate_global()[0]
     return Nu
 
-def FindSurfVRMS(mesh, velocityField, whichwall):
+def FindSurfVRMS(mesh, vectorField, whichwall):
     wall = utilities.WhichWall(whichwall)
-    velSqIntegral = uw.utils.Integral(
-        fn = fn.math.dot(velocityField, velocityField),
+    vectorFieldSqIntegral = uw.utils.Integral(
+        fn = fn.math.dot(vectorField, vectorField),
         mesh = mesh,
         integrationType = 'surface',
         surfaceIndexSet = wall
@@ -104,8 +104,24 @@ def FindSurfVRMS(mesh, velocityField, whichwall):
         integrationType = 'surface',
         surfaceIndexSet = wall
         )
-    rms = math.sqrt(velSqIntegral.evaluate()[0] / meshIntegral.evaluate()[0])
+    rms = math.sqrt(vectorFieldSqIntegral.evaluate()[0] / meshIntegral.evaluate()[0])
     return rms
+
+def FindSurfaceStresses(devStressField, mesh, whichwall):
+    horizStresses, vertStresses = devStressField[0], devStressField[1]
+    wall = utilities.WhichWall(whichwall)
+    hSt = utilities.EvaluateScalarMeshVarOnSurface(
+        mesh, vertStresses, whichwall, 1000
+        )
+    vSt = utilities.EvaluateScalarMeshVarOnSurface(
+        mesh, vertStresses, whichwall, 1000
+        )
+    hStRMS = FindSurfVRMS(mesh, horizStresses, whichwall)
+    vStRMS = FindSurfVRMS(mesh, vertStresses, whichwall)
+    hStMax = math.max(hSt)
+    vStMax = math.max(vSt)
+    outTuple = (hSt, vSt, hStRMS, vStRMS, hStMax, vStMax)
+    return outTuple
 
 def npFindNusseltNumber(maxVertCoord, npTemperatureField):
     TopInt = sum(np.gradient(npTemperatureField)[1][0])
