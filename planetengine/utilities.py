@@ -567,50 +567,26 @@ def MakeData(MODEL):
     maxY = p.maxY
     modeltime = MODEL.MISC.currentTime
 
-    # Data arrays
-    #if OPTIONS.numpyAnalysis:
+    #vertStressTop, horizStressTop = physics.FindSurfaceStresses(velocityField, viscosityFn, mesh, swarm, devStressField)
+    #surfVel = physics.FindSurfaceHorizontalVelocity(mesh, velocityField, 100)
 
-        #npPartialTemperatureField = Numpify(OPTIONS.dataRes, PARAMETERS.aspect, MESHES.mesh, MESHES.temperatureField)
-        #npGatheredTemperatureField = comm.gather(npPartialTemperatureField, root = 0)
-        #npTemperatureField = np.prod(npGatheredTemperatureField, axis = 0)
-
-        #dataDict = {
-            #'step': MODEL.MISC.currentStep,
-            #'Nu': physics.FindNusseltNumber(temperatureField, mesh, maxX, maxY),
-            #'VRMS':physics.FindVRMS(velocityField, mesh),
-            #'avSurfVel': np.mean(surfVel),
-            #'avTemp': physics.FindFieldAverage(mesh, temperatureField),
-            #'avYield': physics.FindFieldAverage(mesh, yieldFn),
-            #'avVisc': physics.FindFieldAverage(mesh, viscosityFn),
-            #'maxVertStressTop': np.max(vertStressTop),
-            #'maxHorizStressTop': np.max(horizStressTop),
-            #'modeltime': modeltime,
-            #'timeGa': modeltime * f.timescale,
-            #'vertStressTop': vertStressTop,
-            #'horizStressTop': horizStressTop,
-            #'surfVel': surfVel
-            #}
-
-    else:
-        vertStressTop, horizStressTop = physics.FindSurfaceStresses(velocityField, viscosityFn, mesh, swarm, devStressField)
-        surfVel = physics.FindSurfaceHorizontalVelocity(mesh, velocityField, 100)
-
-        # Data points
-        dataDict = {
-            'step': MODEL.MISC.currentStep,
-            'Nu': physics.FindNusseltNumber(temperatureField, mesh, maxX, maxY),
-            'VRMS':physics.FindVRMS(velocityField, mesh),
-            'avSurfVel': np.mean(surfVel),
-            'avTemp': physics.FindFieldAverage(mesh, temperatureField),
-            'avYield': physics.FindFieldAverage(mesh, yieldFn),
-            'avVisc': physics.FindFieldAverage(mesh, viscosityFn),
-            'maxVertStressTop': np.max(vertStressTop),
-            'maxHorizStressTop': np.max(horizStressTop),
-            'modeltime': modeltime,
-            'timeGa': modeltime * f.timescale,
-            'vertStressTop': vertStressTop,
-            'horizStressTop': horizStressTop,
-            'surfVel': surfVel
+    # Data points
+    dataDict = {
+        'step': MODEL.MISC.currentStep,
+        'Nu': physics.FindNusseltNumber(temperatureField, mesh, maxX, maxY),
+        'VRMS':physics.FindVRMS(velocityField, mesh),
+        #'avSurfVel': np.mean(surfVel),
+        'surfVRMS': physics.FindSurfVRMS(mesh, velocityField, 'Top'):
+        'avTemp': physics.FindFieldAverage(mesh, temperatureField),
+        'avYield': physics.FindFieldAverage(mesh, yieldFn),
+        'avVisc': physics.FindFieldAverage(mesh, viscosityFn),
+        #'maxVertStressTop': np.max(vertStressTop),
+        #'maxHorizStressTop': np.max(horizStressTop),
+        'modeltime': modeltime,
+        'timeGa': modeltime * f.timescale,
+        #'vertStressTop': vertStressTop,
+        #'horizStressTop': horizStressTop,
+        #'surfVel': surfVel
             }
 
     return dataDict
