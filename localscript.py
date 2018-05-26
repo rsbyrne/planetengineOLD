@@ -259,7 +259,8 @@ FUNCTIONS.SetVals({
         ),
     'initialHFn': PARAMETERS.initialH,
     'densityFn': PARAMETERS.Ra * MESHES.temperatureField,
-    'creepViscFn': fn.math.exp(-1. * np.log(PARAMETERS.surfEta) * (MESHES.temperatureField - 1.)), # was FKtemp1
+    #'creepViscFn': fn.math.exp(-1. * np.log(PARAMETERS.surfEta) * (MESHES.temperatureField - 1.)), # was FKtemp1
+    'creepViscFn': PARAMETERS.eta0 * PARAMETERS.surfEta ** (1. - MESHES.temperatureField)
     'plasticViscFn': FUNCTIONS.yieldStressFn / (2. * FUNCTIONS.secInv + 1e-18), # was plasticvisc1
     'timescale': physics.Build_TimescaleGyFn_1(PARAMETERS.lengthScale, PARAMETERS.Ra, PARAMETERS.diffusivity)
     })
