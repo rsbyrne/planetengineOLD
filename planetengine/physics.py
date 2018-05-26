@@ -87,11 +87,13 @@ def FindNusseltNumber(temperatureField, mesh):
         surfaceIndexSet = utilities.WhichWall('Bottom')
         )
     NuFn = topTempSurfGradIntegral / basalTempIntegral
-    Nu = NuFn.evaluate_global()
+    Nu = NuFn.evaluate_global()[0]
     return Nu
 
-def TopSurfVelRMS(velocityField, mesh):
-
+def TopSurfVelRMS(mesh, velocityField, n):
+    surfVel = FindSurfaceHorizontalVelocity(mesh, velocityField, n)
+    rms = np.root(np.mean(np.square(surfVel)
+    return rms
 
 def npFindNusseltNumber(maxVertCoord, npTemperatureField):
     TopInt = sum(np.gradient(npTemperatureField)[1][0])
