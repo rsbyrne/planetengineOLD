@@ -93,14 +93,15 @@ class RuntimeCondition():
             return self.arg
 
     class StepInterval():
-        def __init__(self, stepInterval):
+        def __init__(self, stepInterval, TrueOrFalse):
             self.stepInterval = stepInterval
+            self.TrueOrFalse = TrueOrFalse
         def evaluate(self, MODEL):
             currentStep = MODEL.MISC.currentStep
             if currentStep % self.stepInterval == 0:
-                return True
+                return self.TrueOrFalserue
             else:
-                return False
+                return not self.TrueOrFalse
 
     class TimeInterval():
         def __init__(self, timeInterval, TrueOrFalse):
@@ -132,16 +133,23 @@ class RuntimeCondition():
             self.TrueOrFalse = TrueOrFalse
         def evaluate(self, MODEL):
             currentStep = MODEL.MISC.currentStep
-            print "Checking 'AfterStep' condition; step = ", currentStep
             if currentStep == self.targetStep:
-                print "Target step reached."
                 return self.TrueOrFalse
             elif currentStep < self.targetStep:
-                print "Target step not yet reached."
                 return not self.TrueOrFalse
             else:
-                print "Target step exceeded."
                 return self.TrueOrFalse
+
+    class AfterTime():
+        def __init__(self, targetTime, TrueOrFalse):
+            self.targetTime = targetTime
+            self.TrueOrFalse = TrueOrFalse
+        def evaluate(self, MODEL):
+            currentTime = MODEL.MISC.currentTime
+            if currentTime > self.targetTime:
+                return self.TrueOrFalse
+            else:
+                return not self.TrueOrFalse
 
     class AfterEpochTimeDuration():
         def __init__(self, timeCheck, TrueOrFalse):
