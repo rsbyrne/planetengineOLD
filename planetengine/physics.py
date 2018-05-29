@@ -27,7 +27,7 @@ CoordFn = uw.function.input()
 depthFn = 1. - CoordFn[1]
 
 def FindSurfaceFlux(mesh, whichwall, scalarField):
-    wall = utilities.WhichWall(whichwall)
+    wall = utilities.WhichWall(mesh, whichwall)
     flux = uw.utils.Integral(
         fn = scalarField.fn_gradient[1],
         mesh = mesh,
@@ -77,21 +77,30 @@ def FindNusseltNumber(temperatureField, mesh):
     # the top vertical surface gradient
     # divided by the basal temperature.
 
-    topTempSurfGradIntegral = FindSurfaceFlux(
-        mesh, 'Top', temperatureField
+    topWall = utilities.WhichWall(mesh, 'Top')
+    bottomWall = utilities.WhichWall(mesh, 'Bottom')
+
+    topTempSurfGradIntegral = uw.utils.Integral(
+        fn = temperatureField.fn_gradient[1],
+        mesh = mesh,
+        integrationType = 'surface',
+        surfaceIndexSet = topWall
         )
     basalTempIntegral = uw.utils.Integral(
         fn = temperatureField,
         mesh = mesh,
         integrationType = 'surface',
-        surfaceIndexSet = utilities.WhichWall('Bottom')
+        surfaceIndexSet = bottomWall
         )
-    NuFn = topTempSurfGradIntegral / basalTempIntegral
-    Nu = NuFn.evaluate_global()[0]
+
+    #NuFn = topTempSurfGradIntegral / basalTempIntegral
+    #Nu = NuFn.evaluate_global()[0]
+    Nu = - topTempSurfGradIntegral.evaluate()[0] / basalTempIntegral.evaluate()[0]
+
     return Nu
 
 def FindSurfVRMS(mesh, vectorField, whichwall):
-    wall = utilities.WhichWall(whichwall)
+    wall = utilities.WhichWall(mesh, whichwall)
     vectorFieldSqIntegral = uw.utils.Integral(
         fn = fn.math.dot(vectorField, vectorField),
         mesh = mesh,
@@ -109,7 +118,7 @@ def FindSurfVRMS(mesh, vectorField, whichwall):
 
 def FindSurfaceStresses(devStressField, mesh, whichwall):
     horizStresses, vertStresses = devStressField[0], devStressField[1]
-    wall = utilities.WhichWall(whichwall)
+    wall = utilities.WhichWall(mesh, whichwall)
     hSt = utilities.EvaluateScalarMeshVarOnSurface(
         mesh, vertStresses, whichwall, 1000
         )
@@ -118,8 +127,8 @@ def FindSurfaceStresses(devStressField, mesh, whichwall):
         )
     hStRMS = FindSurfVRMS(mesh, horizStresses, whichwall)
     vStRMS = FindSurfVRMS(mesh, vertStresses, whichwall)
-    hStMax = math.max(hSt)
-    vStMax = math.max(vSt)
+    hStMax = hSt.max()
+    vStMax = vSt.max()
     outTuple = (hSt, vSt, hStRMS, vStRMS, hStMax, vStMax)
     return outTuple
 
@@ -129,7 +138,7 @@ def npFindNusseltNumber(maxVertCoord, npTemperatureField):
     Nu = - maxVertCoord * TopInt / BottomInt
     return Nu
 
-def GetStressStrain(viscosityFn, velocityField):
+#def GetStressStrain(viscosityFn, velocityField):
 
     # **Calculate stress values for benchmark comparison**
     #
@@ -155,39 +164,39 @@ def GetStressStrain(viscosityFn, velocityField):
 
     # In[14]:
 
-    strainRateFn = fn.tensor.symmetric(velocityField.fn_gradient)
-    secInv = fn.tensor.second_invariant(strainRateFn)
-    stressFn = 2. * viscosityFn * strainRateFn
-    devStressFn = fn.tensor.deviatoric(stressFn)
-    devStress2ndInv = fn.tensor.second_invariant(devStressFn)
+    #strainRateFn = fn.tensor.symmetric(velocityField.fn_gradient)
+    #secInv = fn.tensor.second_invariant(strainRateFn)
+    #stressFn = 2. * viscosityFn * strainRateFn
+    #devStressFn = fn.tensor.deviatoric(stressFn)
+    #devStress2ndInv = fn.tensor.second_invariant(devStressFn)
 
-    return strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv
+    #return strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv
 
-def FindSurfaceStresses(velocityField, viscosityFn, mesh, swarm, devStressField):
+#def FindSurfaceStresses(velocityField, viscosityFn, mesh, devStressField):
 
     # TESTING!!!
     # 'stressField' input currently being ignored
 
-    strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv = GetStressStrain(viscosityFn, velocityField)
+    #strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv = GetStressStrain(viscosityFn, velocityField)
 
-    projector = uw.utils.MeshVariable_Projection(devStressField, stressFn, type=0)
-    projector.solve()
+    #projector = uw.utils.MeshVariable_Projection(devStressField, stressFn, type=0)
+    #projector.solve()
 
-    horizStressTop = utilities.EvaluateScalarMeshVarOnSurface(
-        mesh,
-        devStressField[0],
-        'Top',
-        100
-        )
+    #horizStressTop = utilities.EvaluateScalarMeshVarOnSurface(
+        #mesh,
+        #devStressField[0],
+        #'Top',
+        #100
+        #)
 
-    vertStressTop = utilities.EvaluateScalarMeshVarOnSurface(
-        mesh,
-        devStressField[1],
-        'Top',
-        100
-        )
+    #vertStressTop = utilities.EvaluateScalarMeshVarOnSurface(
+        #mesh,
+        #devStressField[1],
+        #'Top',
+        #100
+        #)
 
-    return horizStressTop, vertStressTop
+    #return horizStressTop, vertStressTop
 
 def FindSurfaceHorizontalVelocity(mesh, velocityField, n):
     surfVel = utilities.EvaluateScalarMeshVarOnSurface(mesh, velocityField[0], 'Top', n)

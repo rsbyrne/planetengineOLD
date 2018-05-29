@@ -312,19 +312,15 @@ def UpdateField(field, function):
     projectorStress = uw.utils.MeshVariable_Projection(field, function, type=0)
     projectorStress.solve()
 
-def WhichWall(whichwall):
+def WhichWall(mesh, whichwall):
     if whichwall == 'Top':
-        wall = "MaxJ_VertexSet"
-        component = 1
+        wall = mesh.specialSets["MaxJ_VertexSet"]
     elif whichwall == 'Bottom':
-        wall = "MinJ_VertexSet"
-        component = 1
+        wall = mesh.specialSets["MinJ_VertexSet"]
     elif whichwall == 'Left':
-        wall = "MinI_VertexSet"
-        component = 0
+        wall = mesh.specialSets["MinI_VertexSet"]
     elif whichwall == 'Right':
-        wall = "MaxI_VertexSet"
-        component = 0
+        wall = mesh.specialSets["MaxI_VertexSet"]
     return wall
 
 def Numpify(arrRes, arrAspect, uwMesh, uwVar):
@@ -437,7 +433,7 @@ def MakeFigs(MODEL, key):
     viscosityFn = f.viscosityFn
     yieldFn = f.yieldFn
 
-    strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv = physics.GetStressStrain(viscosityFn, velocityField)
+    #strainRateFn, secInv, stressFn, devStressFn, devStress2ndInv = physics.GetStressStrain(viscosityFn, velocityField)
 
     outputPath = o.projectname + '_Output/' + o.projectname
 
@@ -567,16 +563,16 @@ def MakeData(MODEL):
     maxY = p.maxY
     modeltime = MODEL.MISC.currentTime
 
-    hStTop, vStTop, hStRMSTop, vStRMSTop, hStMaxTop, vStMaxTop = 
-        FindSurfaceStresses(MESHES.devStressField, MESHES.mesh, 'Top')
+    hStTop, vStTop, hStRMSTop, vStRMSTop, hStMaxTop, vStMaxTop = physics.FindSurfaceStresses(
+        MESHES.devStressField, MESHES.mesh, 'Top')
 
     # Data points
     dataDict = {
         'step': MODEL.MISC.currentStep,
-        'Nu': physics.FindNusseltNumber(temperatureField, mesh, maxX, maxY),
+        'Nu': physics.FindNusseltNumber(temperatureField, mesh),
         'VRMS':physics.FindVRMS(velocityField, mesh),
         #'avSurfVel': np.mean(surfVel),
-        'surfVRMS': physics.FindSurfVRMS(mesh, velocityField, 'Top'):
+        'surfVRMS': physics.FindSurfVRMS(mesh, velocityField, 'Top'),
         'avTemp': physics.FindFieldAverage(mesh, temperatureField),
         'avYield': physics.FindFieldAverage(mesh, yieldFn),
         'avVisc': physics.FindFieldAverage(mesh, viscosityFn),
@@ -630,11 +626,7 @@ def GatherData(MODEL):
 
 def UpdateData(MODEL):
     #workingDict = GatherData(MODEL)
-    if rank == 0:
-        dataDict = MakeData(MODEL)
-    else:
-        dataDict = None
-    #dataDict = comm.bcast(dataDict, root = 0)
+    dataDict = MakeData(MODEL)
     MODEL.DATA.SetVal(str(MODEL.MISC.currentStep), dataDict)
 
 def Analyse(MODEL):
@@ -849,7 +841,11 @@ def RunLoop(MODEL, startTime):
 
     MODEL.SYSTEMS.population_control.repopulate()
 
-    projector = uw.utils.MeshVariable_Projection(MODEL.MESHES.devStressField, FUNCTIONS.stressFn, type=0)
+    projector = uw.utils.MeshVariable_Projection(
+        MODEL.MESHES.devStressField,
+        MODEL.FUNCTIONS.stressFn,
+        type = 0
+        )
     projector.solve()
 
     if rank == 0:
@@ -920,7 +916,12 @@ def Run(MODEL, startStep = 0):
         #SWARMS.materialVar.data[:] = FUNCTIONS.initialMaterialFn
         MODEL.FUNCTIONS.initialTempFn.evaluate(MODEL.MESHES.mesh)
         MODEL.MESHES.HField.data[:] = MODEL.FUNCTIONS.initialHFn
-        projector = uw.utils.MeshVariable_Projection(MODEL.MESHES.devStressField, FUNCTIONS.stressFn, type=0)
+
+        projector = uw.utils.MeshVariable_Projection(
+            MODEL.MESHES.devStressField,
+            MODEL.FUNCTIONS.stressFn,
+            type = 0
+            )
         projector.solve()
 
         if MODEL.OPTIONS.saveStateCondition.evaluate(MODEL):

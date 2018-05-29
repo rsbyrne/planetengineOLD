@@ -16,10 +16,9 @@ import csv
 import mpi4py
 import os
 import time
-import planetengine1 as planetengine
+import planetengine
 from planetengine import utilities
 from planetengine import physics
-from planetengine import templates
 
 comm = mpi4py.MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -64,7 +63,7 @@ MISC = MODEL.MISC
 # In[ ]:
 
 OPTIONS.SetVals({
-    'projectname': 'Testing1', #'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
+    'projectname': 'Testing2', #'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
 
     'showfigquality': 4,
     'savefigquality': 8,
@@ -75,7 +74,8 @@ OPTIONS.SetVals({
     'analyseFromLoadedState': False
     })
 
-OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.1, False))
+#OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.05, False))
+OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(100, False))
 OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.ConstantBool(True))
 OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(True))
 OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.ConstantBool(True))
@@ -123,7 +123,7 @@ PARAMETERS.SetVals({
     # Non-physicsy stuff
 
     'aspect':1,
-    'res':16,
+    'res':64,
     'particlesPerCell':12,
     'presolve':False,
     'randomSeed':1066,
@@ -242,7 +242,7 @@ SWARMS.swarm.populate_using_layout(
 SWARMS.SetVal('materialVar', SWARMS.swarm.add_variable(dataType = "int", count = 1))
 SWARMS.materialVar.data[:] = 0
 
-FUNCTIONS.SetVal('strainRateFn', fn.tensor.symmetric(velocityField.fn_gradient))
+FUNCTIONS.SetVal('strainRateFn', fn.tensor.symmetric(MESHES.velocityField.fn_gradient))
 FUNCTIONS.SetVal('secInv', fn.tensor.second_invariant(FUNCTIONS.strainRateFn))
 
 FUNCTIONS.SetVals({
@@ -260,8 +260,8 @@ FUNCTIONS.SetVals({
         ),
     'initialHFn': PARAMETERS.initialH,
     'densityFn': PARAMETERS.Ra * MESHES.temperatureField,
-    #'creepViscFn': fn.math.exp(-1. * np.log(PARAMETERS.surfEta) * (MESHES.temperatureField - 1.)), # was FKtemp1
-    'creepViscFn': PARAMETERS.eta0 * PARAMETERS.surfEta ** (1. - MESHES.temperatureField)
+    'creepViscFn': fn.math.exp(-1. * np.log(PARAMETERS.surfEta) * (MESHES.temperatureField - 1.)), # was FKtemp1
+    #'creepViscFn': PARAMETERS.eta0 * fn.math.pow(PARAMETERS.surfEta, 1. - MESHES.temperatureField),
     'plasticViscFn': FUNCTIONS.yieldStressFn / (2. * FUNCTIONS.secInv + 1e-18), # was plasticvisc1
     'timescale': physics.Build_TimescaleGyFn_1(PARAMETERS.lengthScale, PARAMETERS.Ra, PARAMETERS.diffusivity)
     })
@@ -284,7 +284,7 @@ FUNCTIONS.SetVals({
 
 FUNCTIONS.SetVal('stressFn', 2. * FUNCTIONS.viscosityFn * FUNCTIONS.strainRateFn)
 FUNCTIONS.SetVal('devStressFn', fn.tensor.deviatoric(FUNCTIONS.stressFn))
-FUNCTIONS.SetVal('devStress2ndInv' = fn.tensor.second_invariant(FUNCTIONS.devStressFn))
+FUNCTIONS.SetVal('devStress2ndInv', fn.tensor.second_invariant(FUNCTIONS.devStressFn))
 
 MESHES.temperatureField.load("VERYIMPORTANT64.h5", interpolate=True)
 
