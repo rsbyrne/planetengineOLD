@@ -1,8 +1,8 @@
 #!/bin/bash
 #PBS -P m18
-#PBS -q normal
-#PBS -l walltime=20:00:00
-#PBS -l mem=300MB
+#PBS -q express
+#PBS -l walltime=00:01:00
+#PBS -l mem=1GB
 #PBS -l jobfs=1GB
 #PBS -l ncpus=16
 ## For licensed software, you have to specify it to get the job running. For unlicensed software, you should also specify$
@@ -10,7 +10,5 @@
 ## The job will be executed from current working directory instead of home.
 #PBS -l wd
 
-module load python/2.7.5
-module load python/2.7.5-matplotlib
-module load openmpi/1.10.2
-mpirun ./localscript.py > my_output.out
+module load underworld/2.5.0
+mpirun -np 16 localscript.py > my_output.out
