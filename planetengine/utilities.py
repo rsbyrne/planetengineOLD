@@ -99,7 +99,7 @@ class RuntimeCondition():
         def evaluate(self, MODEL):
             currentStep = MODEL.MISC.currentStep
             if currentStep % self.stepInterval == 0:
-                return self.TrueOrFalserue
+                return self.TrueOrFalse
             else:
                 return not self.TrueOrFalse
 
