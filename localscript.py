@@ -63,7 +63,7 @@ MISC = MODEL.MISC
 # In[ ]:
 
 OPTIONS.SetVals({
-    'projectname': 'Testing2', #'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
+    'projectname': 'Testing', #'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
 
     'showfigquality': 4,
     'savefigquality': 8,
@@ -75,10 +75,10 @@ OPTIONS.SetVals({
     })
 
 #OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.05, False))
-OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(100, False))
-OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.ConstantBool(True))
+OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(1000, False))
+OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.StepInterval(10, True))
 OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(True))
-OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.ConstantBool(True))
+OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.StepInterval(100, True))
 OPTIONS.SetVal('saveFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
 OPTIONS.SetVal('showFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
 OPTIONS.SetVal('saveStateCondition', utilities.RuntimeCondition.CombinedCondition('any',
