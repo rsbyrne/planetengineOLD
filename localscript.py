@@ -82,7 +82,7 @@ OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.StepInterval(100,
 OPTIONS.SetVal('saveFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
 OPTIONS.SetVal('showFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
 OPTIONS.SetVal('saveStateCondition', utilities.RuntimeCondition.CombinedCondition('any',
-    ((utilities.RuntimeCondition.StepInterval(10000, True), utilities.RuntimeCondition.UponCompletion(True)))))
+    ((utilities.RuntimeCondition.StepInterval(1000, True), utilities.RuntimeCondition.UponCompletion(True)))))
 
 # In[ ]:
 
@@ -110,7 +110,7 @@ PARAMETERS.SetVals({
     'frictionCoefficient':1.,
     'isoviscous':False,
 
-    'tau0': 3e5,
+    'tau0': 15e5,
     'tau1': 1e7,
 
     'maxTemp':1.,
