@@ -665,6 +665,7 @@ def Analyse(MODEL):
             PrintData(MODEL.DATA, step, modeltime)
         if o.saveDataCondition.evaluate(MODEL) and not MODEL.MISC.updateDataBuffer == []:
             SaveData(MODEL.DATA, projectname, MODEL.MISC.updateDataBuffer)
+            MODEL.DATA.selfdict.clear()
             MODEL.MISC.SetVal('updateDataBuffer', [])
         if o.showFigsCondition.evaluate(MODEL):
             MakeFigs(MODEL, 'showFigs')
@@ -789,6 +790,8 @@ def SaveState(MODEL):
     if rank == 0:
         SaveLog(MODEL.LOG, MODEL.MISC, MODEL.MISC.unsavedSteps, o.projectname)
     MODEL.MISC.SetVal('unsavedSteps', [])
+
+    MODEL.LOG.selfdict.clear()
 
 def SaveLog(LOG, MISC, stepsToSave, projectname):
     keyList = sorted(MISC.selfdict.keys(), key = str.lower)
