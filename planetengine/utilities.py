@@ -788,15 +788,15 @@ def SaveState(MODEL):
 
     MODEL.MISC.SetVal('saveState', True)
     if rank == 0:
-        SaveLog(MODEL.LOG, MODEL.MISC, MODEL.MISC.unsavedSteps, o.projectname)
-    MODEL.MISC.SetVal('unsavedSteps', [])
+        SaveLog(MODEL.LOG, MODEL.MISC, MODEL.MISC.lastSavedState, o.projectname)
+    MODEL.MISC.SetVal('lastSavedState', MODEL.MISC.currentStep)
 
     MODEL.LOG.selfdict.clear()
 
-def SaveLog(LOG, MISC, stepsToSave, projectname):
+def SaveLog(LOG, MISC, lastSavedState, projectname):
     keyList = sorted(MISC.selfdict.keys(), key = str.lower)
     dataLoL = []
-    for step in stepsToSave:
+    for step in range(lastSavedState, MISC.currentStep):
         dataDict = LOG.selfdict[step]
         row = []
         for key in keyList:
@@ -876,9 +876,9 @@ def RunLoop(MODEL, startTime):
         'saveState': False
         })
     MODEL.MISC.SetVal('modelrunComplete', not MODEL.OPTIONS.modelRunCondition.evaluate(MODEL))
-    unsavedSteps = MODEL.MISC.unsavedSteps
-    unsavedSteps.append(MODEL.MISC.currentStep)
-    MODEL.MISC.SetVal('unsavedSteps', unsavedSteps)
+    #lastSavedState = MODEL.MISC.lastSavedState
+    #unsavedSteps.append(MODEL.MISC.currentStep)
+    #MODEL.MISC.SetVal('unsavedSteps', unsavedSteps)
 
     Analyse(MODEL)
 
@@ -922,7 +922,7 @@ def Run(MODEL, startStep = 0):
             'runningStatus': False,
             'modelrunComplete': False,
             'savedState': False,
-            'unsavedSteps': []
+            'lastSavedState': 0
             })
 
         # Initialise meshvars
@@ -953,7 +953,7 @@ def Run(MODEL, startStep = 0):
         #MODEL.MISC.SetVal('unsavedSteps', [step for step in range(startStep + 1)])
         LoadState(MODEL, startStep)
         MODEL.MISC.SetVal('modelrunComplete', False)
-        MODEL.MISC.SetVal('unsavedSteps', [])
+        MODEL.MISC.SetVal('lastSavedState', startStep)
         MODEL.MISC.SetVal('updateDataBuffer', []) # Will this cause problems???
 
     # RUNNING!
