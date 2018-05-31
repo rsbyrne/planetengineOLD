@@ -796,7 +796,7 @@ def SaveState(MODEL):
 def SaveLog(LOG, MISC, lastSavedState, projectname):
     keyList = sorted(MISC.selfdict.keys(), key = str.lower)
     dataLoL = []
-    for step in range(lastSavedState, MISC.currentStep):
+    for step in range(lastSavedState + 1, MISC.currentStep + 1):
         dataDict = LOG.selfdict[step]
         row = []
         for key in keyList:
