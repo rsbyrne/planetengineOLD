@@ -804,7 +804,7 @@ def SaveLog(LOG, MISC, stepsToSave, projectname):
         dataLoL.append(row)
     MakeCSV(projectname, "miscLog", keyList, dataLoL)
 
-def MakeDataFromLoadState(MODEL, stepTuple):
+def MakeDataFromLoadState(MODEL, stepTuple, figures = True, data = True):
     print "Making data from loaded state."
     if rank == 0:
         startStep, stopStep = stepTuple
@@ -821,9 +821,11 @@ def MakeDataFromLoadState(MODEL, stepTuple):
                 print "Saved state found!"
                 MODEL.MISC.SetDict(MODEL.LOG.selfdict[step])
                 LoadState(MODEL, step)
-                UpdateData(MODEL)
-                SaveData(MODEL.DATA, projectname, [step])
-                MakeFigs(MODEL, 'saveFigs')
+                if data:
+		            UpdateData(MODEL)
+		            SaveData(MODEL.DATA, projectname, [step])
+                if figures:
+                    MakeFigs(MODEL, 'saveFigs')
             step += 1
 
 def UpdateEpochTime():
