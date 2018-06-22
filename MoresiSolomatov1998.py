@@ -1,8 +1,4 @@
 
-# coding: utf-8
-
-# In[ ]:
-
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -24,12 +20,8 @@ comm = mpi4py.MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-#%matplotlib inline
 CoordFn = uw.function.input()
 depthFn = 1. - CoordFn[1]
-
-
-# In[ ]:
 
 MODEL = utilities.Collection()
 MODEL.SetVals({
@@ -58,21 +50,16 @@ OPTIONS.SetVals({
 
     'showfigquality': 4,
     'savefigquality': 8,
-    
-    'numpyAnalysis': False,
-    'dataRes': 100,
-    
-    'analyseFromLoadedState': False
-    })
 
-OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.05, False))
-OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.StepInterval(10, True))
-OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(True))
-OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.StepInterval(100, True))
-OPTIONS.SetVal('saveFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
-OPTIONS.SetVal('showFigsCondition', utilities.RuntimeCondition.ConstantBool(False))
-OPTIONS.SetVal('saveStateCondition', utilities.RuntimeCondition.CombinedCondition('any',
-    ((utilities.RuntimeCondition.StepInterval(1000, True), utilities.RuntimeCondition.UponCompletion(True)))))
+    'modelRunCondition': utilities.RuntimeCondition.TimeInterval(0.05, False),
+    'updateDataCondition': utilities.RuntimeCondition.StepInterval(10, True),
+    'printDataCondition': utilities.RuntimeCondition.ConstantBool(True),
+    'saveDataCondition': utilities.RuntimeCondition.StepInterval(100, True),
+    'saveFigsCondition': utilities.RuntimeCondition.ConstantBool(False),
+    'showFigsCondition', utilities.RuntimeCondition.ConstantBool(False),
+    'saveStateCondition': utilities.RuntimeCondition.CombinedCondition('any',
+        ((utilities.RuntimeCondition.StepInterval(1000, True), utilities.RuntimeCondition.UponCompletion(True))))
+    })
 
 PARAMETERS.SetVals({
     'Ra':1e7,
