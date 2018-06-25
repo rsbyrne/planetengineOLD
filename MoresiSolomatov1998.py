@@ -133,11 +133,6 @@ MESHES.SetVals({
         )
     })
 
-
-# In[ ]:
-
-# Setting up boundary conditions
-
 BottomWall = MESHES.mesh.specialSets["MinJ_VertexSet"] 
 TopWall = MESHES.mesh.specialSets["MaxJ_VertexSet"] 
 LeftWall = MESHES.mesh.specialSets["MinI_VertexSet"] 
@@ -160,11 +155,6 @@ freeslipBC = uw.conditions.DirichletCondition(
     variable = MESHES.velocityField, 
     indexSetsPerDof = (IWalls, JWalls)
     )
-
-
-# In[ ]:
-
-# Setting up advector
 
 SWARMS.SetVal('swarm', uw.swarm.Swarm(mesh = MESHES.mesh))
 
@@ -248,9 +238,9 @@ SYSTEMS.SetVals({
     'stokes': uw.systems.Stokes(
         velocityField = MESHES.velocityField, 
         pressureField = MESHES.pressureField,
-        voronoi_swarm = SWARMS.swarm, #(not sure if this is necessary or not)
+        voronoi_swarm = SWARMS.swarm,
         conditions = [freeslipBC,], #[periodicBC,],
-        fn_viscosity = FUNCTIONS.viscosityFn, 
+        fn_viscosity = FUNCTIONS.viscosityFn,
         fn_bodyforce = FUNCTIONS.densityFn * PARAMETERS.z_hat
         ),
     })
