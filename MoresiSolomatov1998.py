@@ -56,7 +56,7 @@ OPTIONS.SetVals({
     'printDataCondition': utilities.RuntimeCondition.ConstantBool(True),
     'saveDataCondition': utilities.RuntimeCondition.StepInterval(100, True),
     'saveFigsCondition': utilities.RuntimeCondition.ConstantBool(False),
-    'showFigsCondition', utilities.RuntimeCondition.ConstantBool(False),
+    'showFigsCondition': utilities.RuntimeCondition.ConstantBool(False),
     'saveStateCondition': utilities.RuntimeCondition.CombinedCondition('any',
         ((utilities.RuntimeCondition.StepInterval(1000, True), utilities.RuntimeCondition.UponCompletion(True))))
     })
