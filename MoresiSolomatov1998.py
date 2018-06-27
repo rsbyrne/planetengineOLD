@@ -211,7 +211,7 @@ FUNCTIONS.SetVal('stressFn', 2. * FUNCTIONS.viscosityFn * FUNCTIONS.strainRateFn
 FUNCTIONS.SetVal('devStressFn', fn.tensor.deviatoric(FUNCTIONS.stressFn))
 FUNCTIONS.SetVal('devStress2ndInv', fn.tensor.second_invariant(FUNCTIONS.devStressFn))
 
-MESHES.temperatureField.load("VERYIMPORTANT64.h5", interpolate=True)
+MESHES.temperatureField.load("isoviscousRa1e7res64.h5", interpolate=True)
 
 SYSTEMS.SetVals({
     'population_control': uw.swarm.PopulationControl(
