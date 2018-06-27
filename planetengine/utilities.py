@@ -567,8 +567,6 @@ def MakeData(MODEL):
     viscosityFn = f.viscosityFn
     yieldFn = f.yieldFn
 
-    maxX = p.maxX
-    maxY = p.maxY
     modeltime = MODEL.MISC.currentTime
 
     hStTop, vStTop, hStRMSTop, vStRMSTop, hStMaxTop, vStMaxTop = physics.FindSurfaceStresses(
