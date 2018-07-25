@@ -63,18 +63,18 @@ MISC = MODEL.MISC
 # In[ ]:
 
 OPTIONS.SetVals({
-    'projectname': 'Testing', #'MS98Ra1e7res64eta3e4tauone1e7taunought4e5_NOSWARM', #'ParaMS98Ra1e7res32',
+    'projectname': 'Testing', #'MS98Ra1e7res64eta3e4tauone1e7taunought3e5', #'ParaMS98Ra1e7res32',
 
     'showfigquality': 4,
     'savefigquality': 8,
-
+    
     'numpyAnalysis': False,
     'dataRes': 100,
     
     'analyseFromLoadedState': False
     })
 
-#OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.2, False))
+#OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.05, False))
 OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(1000, False))
 OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.StepInterval(10, True))
 OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(True))
@@ -110,7 +110,7 @@ PARAMETERS.SetVals({
     'frictionCoefficient':1.,
     'isoviscous':False,
 
-    'tau0': 4e5,
+    'tau0': 15e5,
     'tau1': 1e7,
 
     'maxTemp':1.,
@@ -137,7 +137,7 @@ PARAMETERS.SetVals({
 PARAMETERS.SetVals({
     'rho0cont': PARAMETERS.rho0 * 1e1,
     'alpha': PARAMETERS.Ra,
-    'alphaCont': PARAMETERS.Ra * 1e1,
+    'alphaCont': PARAMETERS.Ra * 1e1, 
     'surfTemp': PARAMETERS.minTemp,
     'baseTemp': PARAMETERS.maxTemp,
     'boundaryLayerThickness': 1.,
@@ -156,9 +156,9 @@ PARAMETERS.SetVals({
 
 MESHES.SetVals({
     'mesh': uw.mesh.FeMesh_Cartesian(
-        elementType = ("Q1/dQ0"),
-        elementRes  = (int(PARAMETERS.res*PARAMETERS.aspect), PARAMETERS.res),
-        minCoord    = (PARAMETERS.minX, PARAMETERS.minY),
+        elementType = ("Q1/dQ0"), 
+        elementRes  = (int(PARAMETERS.res*PARAMETERS.aspect), PARAMETERS.res), 
+        minCoord    = (PARAMETERS.minX, PARAMETERS.minY), 
         maxCoord    = (PARAMETERS.maxX, PARAMETERS.maxY),
         #periodic    = [True, False]
         )
@@ -197,39 +197,31 @@ MESHES.SetVals({
         )
     })
 
-MESHES.SetVal('stasisField',
-    uw.mesh.MeshVariable(
-        mesh = MESHES.mesh,
-        nodeDofCount = 2
-        ),
-    )
-
-MESHES.stasisField.data[:] = [0.,0.]
 
 # In[ ]:
 
 # Setting up boundary conditions
 
-BottomWall = MESHES.mesh.specialSets["MinJ_VertexSet"]
-TopWall = MESHES.mesh.specialSets["MaxJ_VertexSet"]
-LeftWall = MESHES.mesh.specialSets["MinI_VertexSet"]
+BottomWall = MESHES.mesh.specialSets["MinJ_VertexSet"] 
+TopWall = MESHES.mesh.specialSets["MaxJ_VertexSet"] 
+LeftWall = MESHES.mesh.specialSets["MinI_VertexSet"] 
 RightWall = MESHES.mesh.specialSets["MaxI_VertexSet"]
 IWalls = LeftWall + RightWall
 JWalls = TopWall + BottomWall
 AllWalls = IWalls + JWalls
 
 tempBC = uw.conditions.DirichletCondition(
-    variable = MESHES.temperatureField,
+    variable = MESHES.temperatureField, 
     indexSetsPerDof = (JWalls)
     )
 
 #periodicBC = uw.conditions.DirichletCondition(
-    #variable = MESHES.velocityField,
+    #variable = MESHES.velocityField, 
     #indexSetsPerDof = (BottomWall, JWalls)
     #)
 
 freeslipBC = uw.conditions.DirichletCondition(
-    variable = MESHES.velocityField,
+    variable = MESHES.velocityField, 
     indexSetsPerDof = (IWalls, JWalls)
     )
 
@@ -275,18 +267,14 @@ FUNCTIONS.SetVals({
     })
 
 FUNCTIONS.SetVals({
-    #'viscosityFn': fn.branching.map(
-        #fn_key = SWARMS.materialVar,
-        #mapping = {
-            #0: utilities.CapValue(
-                #fn.misc.min(FUNCTIONS.creepViscFn, FUNCTIONS.plasticViscFn),
-                #(PARAMETERS.eta0, PARAMETERS.eta0 * PARAMETERS.surfEta)
-                #)
-            #}
-        #),
-    'viscosityFn': utilities.CapValue(
-        fn.misc.min(FUNCTIONS.creepViscFn, FUNCTIONS.plasticViscFn),
-        (PARAMETERS.eta0, PARAMETERS.eta0 * PARAMETERS.surfEta)
+    'viscosityFn': fn.branching.map(
+        fn_key = SWARMS.materialVar,
+        mapping = {
+            0: utilities.CapValue(
+                fn.misc.min(FUNCTIONS.creepViscFn, FUNCTIONS.plasticViscFn),
+                (PARAMETERS.eta0, PARAMETERS.eta0 * PARAMETERS.surfEta)
+                )
+            }
         ),
     'yieldFn': uw.function.branching.conditional([
         (FUNCTIONS.creepViscFn < FUNCTIONS.plasticViscFn, 0.),
@@ -309,25 +297,25 @@ SYSTEMS.SetVals({
         maxSplits = 10,
         particlesPerCell = PARAMETERS.particlesPerCell
         ),
-    'advDiff':  uw.systems.AdvectionDiffusion(
-        MESHES.temperatureField,
-        MESHES.temperatureDotField,
-        MESHES.velocityField,
+    'advDiff':  uw.systems.AdvectionDiffusion( 
+        MESHES.temperatureField, 
+        MESHES.temperatureDotField, 
+        MESHES.velocityField, 
         fn_diffusivity = PARAMETERS.diffusivity,
         fn_sourceTerm = MESHES.HField,
         conditions = [tempBC]
         ),
     'advector': uw.systems.SwarmAdvector(
         swarm = SWARMS.swarm,
-        velocityField = MESHES.stasisField,
+        velocityField = MESHES.velocityField,
         order = 2
         ),
     'stokes': uw.systems.Stokes(
-        velocityField = MESHES.velocityField,
+        velocityField = MESHES.velocityField, 
         pressureField = MESHES.pressureField,
-        #voronoi_swarm = SWARMS.swarm, #(not sure if this is necessary or not)
+        voronoi_swarm = SWARMS.swarm, #(not sure if this is necessary or not)
         conditions = [freeslipBC,], #[periodicBC,],
-        fn_viscosity = FUNCTIONS.viscosityFn,
+        fn_viscosity = FUNCTIONS.viscosityFn, 
         fn_bodyforce = FUNCTIONS.densityFn * PARAMETERS.z_hat
         ),
     })
@@ -349,3 +337,5 @@ utilities.Run(MODEL, startStep = 0)
 #for integer in range(300, 400):
     #index = integer*100
     #utilities.MakeDataFromLoadState(MODEL, (index, index+1), data = False)
+
+
