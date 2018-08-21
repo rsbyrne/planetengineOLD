@@ -251,7 +251,7 @@ class InitialConditions():
             self.field = field
             self.filename = filename
             self.interpolate = interpolate
-        def evaluate(self)):
+        def evaluate(self):
             self.field.load(
                 self.filename,
                 interpolate = self.interpolate
@@ -869,11 +869,16 @@ def RunLoop(MODEL, startTime):
         print "Doing the run loop."
 
     MODEL.SYSTEMS.solver.solve(nonLinearIterate = MODEL.PARAMETERS.yielding)
-    dt = np.min([MODEL.SYSTEMS.advDiff.get_max_dt(), MODEL.SYSTEMS.advector.get_max_dt()])
-    MODEL.SYSTEMS.advDiff.integrate(dt)
-    MODEL.SYSTEMS.advector.integrate(dt)
-
-    MODEL.SYSTEMS.population_control.repopulate()
+    if MODEL.PARAMETERS.useSwarm == True:
+        print "This one!"
+        dt = np.min([MODEL.SYSTEMS.advDiff.get_max_dt(), MODEL.SYSTEMS.advector.get_max_dt()])
+        MODEL.SYSTEMS.advDiff.integrate(dt)
+        MODEL.SYSTEMS.advector.integrate(dt)
+        MODEL.SYSTEMS.population_control.repopulate()
+    else:
+        print "The other one!"
+        dt = MODEL.SYSTEMS.advDiff.get_max_dt()
+        MODEL.SYSTEMS.advDiff.integrate(dt)
 
     projector = uw.utils.MeshVariable_Projection(
         MODEL.MESHES.devStressField,
