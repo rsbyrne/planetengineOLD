@@ -201,13 +201,22 @@ class RuntimeCondition():
 class InitialConditions():
 
     class NoisyGradient():
-        def __init__(self, field, gradient = 1., smoothness = 1, randomSeed = 1066, range = (0., 1.)):
+        def __init__(
+            self,
+            mesh = None,
+            field = None,
+            gradient = 1.,
+            smoothness = 1,
+            randomSeed = 1066,
+            range = (0., 1.)
+            ):
+            self.mesh = mesh
             self.field = field
             self.gradient = gradient
             self.smoothness = smoothness
             self.range = range
             self.randomSeed = randomSeed
-        def evaluate(self, mesh):
+        def evaluate(self):
             #tempGradFn = depthFn * self.gradient * (self.range[1] - self.range[0]) + self.range[0]
             #field.data[:] = CapValue(randomise(self.smoothness, self.randomSeed) * tempGradFn.evaluate(mesh), self.range)
             tempGradFn = depthFn * self.gradient * (self.range[1] - self.range[0]) + self.range[0]
@@ -218,13 +227,11 @@ class InitialConditions():
                 (tempGradFn > self.range[1] , self.range[1]), # otherwise, if this, this other thing
                 (True, tempGradFn) # otherwise, this one
                 ])
-
-            self.field.data[:] = initialTempFn.evaluate(mesh)
-
+            self.field.data[:] = initialTempFn.evaluate(self.mesh)
             # Introduce some random noise
             np.random.seed(self.randomSeed)
-            for i in range(len(mesh.data)):
-                yCoord = mesh.data[i][1]
+            for i in range(len(self.mesh.data)):
+                yCoord = self.mesh.data[i][1]
                 if 0 < yCoord < 1.:
                     randnum = 0.
                     smoothness = self.smoothness
@@ -233,6 +240,22 @@ class InitialConditions():
                     randTemp = self.field.data[i] * randnum
                     if self.range[0] < randTemp < self.range[1]:
                         self.field.data[i] = randTemp
+
+    class LoadField():
+        def __init__(
+            self,
+            field = None,
+            filename = None,
+            interpolate = True
+            ):
+            self.field = field
+            self.filename = filename
+            self.interpolate = interpolate
+        def evaluate(self)):
+            self.field.load(
+                self.filename,
+                interpolate = self.interpolate
+                )
 
 def FindManualDerivative(inputTuple):
     timeList, dataList = inputTuple
@@ -925,7 +948,7 @@ def Run(MODEL, startStep = 0):
 
         # Initialise meshvars
         #SWARMS.materialVar.data[:] = FUNCTIONS.initialMaterialFn
-        MODEL.FUNCTIONS.initialTempFn.evaluate(MODEL.MESHES.mesh)
+        MODEL.FUNCTIONS.initialTempFn.evaluate()
         MODEL.MESHES.HField.data[:] = MODEL.FUNCTIONS.initialHFn
 
         projector = uw.utils.MeshVariable_Projection(
