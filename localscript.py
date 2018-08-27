@@ -70,12 +70,12 @@ OPTIONS.SetVals({
 
     'numpyAnalysis': False,
     'dataRes': 100,
-    
+
     'analyseFromLoadedState': False
     })
 
 #OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.TimeInterval(0.2, False))
-OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(1000, False))
+OPTIONS.SetVal('modelRunCondition', utilities.RuntimeCondition.AfterStep(2000, False))
 OPTIONS.SetVal('updateDataCondition', utilities.RuntimeCondition.StepInterval(10, True))
 OPTIONS.SetVal('printDataCondition', utilities.RuntimeCondition.ConstantBool(True))
 OPTIONS.SetVal('saveDataCondition', utilities.RuntimeCondition.StepInterval(100, True))
@@ -260,7 +260,8 @@ FUNCTIONS.SetVals({
 
 FUNCTIONS.SetVals({
     'initialTempFn': utilities.InitialConditions.NoisyGradient(
-        MESHES.temperatureField,
+        mesh = MESHES.mesh,
+        field = MESHES.temperatureField,
         gradient = 10.,
         smoothness = 10,
         randomSeed = PARAMETERS.randomSeed,
@@ -297,8 +298,6 @@ FUNCTIONS.SetVals({
 FUNCTIONS.SetVal('stressFn', 2. * FUNCTIONS.viscosityFn * FUNCTIONS.strainRateFn)
 FUNCTIONS.SetVal('devStressFn', fn.tensor.deviatoric(FUNCTIONS.stressFn))
 FUNCTIONS.SetVal('devStress2ndInv', fn.tensor.second_invariant(FUNCTIONS.devStressFn))
-
-MESHES.temperatureField.load("isoviscousRa1e7res64.h5", interpolate=True)
 
 SYSTEMS.SetVals({
     'population_control': uw.swarm.PopulationControl(
