@@ -130,7 +130,8 @@ PARAMETERS.SetVals({
 
     'boxdimension':1.,
 
-    'deformMesh':False
+    'deformMesh':False,
+    'useSwarm': False
     })
 
 # Self-referencing parameters:
