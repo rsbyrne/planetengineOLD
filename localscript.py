@@ -260,13 +260,17 @@ FUNCTIONS.SetVals({
     })
 
 FUNCTIONS.SetVals({
-    'initialTempFn': utilities.InitialConditions.NoisyGradient(
-        mesh = MESHES.mesh,
+    #'initialTempFn': utilities.InitialConditions.NoisyGradient(
+        #mesh = MESHES.mesh,
+        #field = MESHES.temperatureField,
+        #gradient = 10.,
+        #smoothness = 10,
+        #randomSeed = PARAMETERS.randomSeed,
+        #range = (PARAMETERS.minTemp, PARAMETERS.maxTemp)
+        #),
+    'initialTempFn': utilities.InitialConditions.LoadField(
         field = MESHES.temperatureField,
-        gradient = 10.,
-        smoothness = 10,
-        randomSeed = PARAMETERS.randomSeed,
-        range = (PARAMETERS.minTemp, PARAMETERS.maxTemp)
+        filename = 'isoviscousRa1e7res64.h5'
         ),
     'initialHFn': PARAMETERS.initialH,
     'densityFn': PARAMETERS.Ra * MESHES.temperatureField,
