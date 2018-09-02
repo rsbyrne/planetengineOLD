@@ -100,15 +100,8 @@ PARAMETERS.SetVals({
     'z_hat':(0., 1.),
 
     'eta0':1.,
-    'viscRatio':1.,
-    'minMantleVisc':1.,
-    'minContVisc':1.,
     'surfEta':3e4,
     'yielding':True,
-    'refYieldStress':fn.misc.constant(4e5),
-    'contStressRatio':1e1,
-    'frictionCoefficient':1.,
-    'isoviscous':False,
 
     'tau0': 4e5,
     'tau1': 1e7,
@@ -198,14 +191,6 @@ MESHES.SetVals({
         )
     })
 
-MESHES.SetVal('stasisField',
-    uw.mesh.MeshVariable(
-        mesh = MESHES.mesh,
-        nodeDofCount = 2
-        ),
-    )
-
-MESHES.stasisField.data[:] = [0.,0.]
 
 # In[ ]:
 
@@ -323,7 +308,7 @@ SYSTEMS.SetVals({
         ),
     'advector': uw.systems.SwarmAdvector(
         swarm = SWARMS.swarm,
-        velocityField = MESHES.stasisField,
+        velocityField = MESHES.velocityField,
         order = 2
         ),
     'stokes': uw.systems.Stokes(
